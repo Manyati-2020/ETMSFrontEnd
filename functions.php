@@ -1,8 +1,6 @@
 <?php
 
-	
-
-	const BASE_API = 'http://192.168.8.101:4500/';
+	const BASE_API = 'http://localhost:8080/';
 
 
 	if($_POST['type'] == 'create' ){
@@ -20,7 +18,7 @@
 
 	}elseif($_POST['type'] == 'delete'){
 
-		delete( $_POST['source'] , $_POST['type'] , $_POST['empID'] );
+		delete( $_POST['source'] , $_POST['type'] , $_POST['id'] );
 		header("Location: " . 'http://localhost/ETMSFrontEnd/' .$_POST['source']. '/all.php'); 
 		exit();
 	}
@@ -49,16 +47,20 @@
 		$post_data = $_POST ;
 		$post_data_json = json_encode($post_data);
 
-		post_curl($url, $post_data_json);
+		put_curl($url, $post_data_json);
 
 	}
 
-	function delete($source, $type, $empID){
+	function delete($source, $type, $id){
 
 		$source = $source;
 		$type = $type;
-		$empID = $empID;
-		$url = BASE_API . $source . '/' . $type . '/' . $empID;
+		$id = $id;
+		$url = BASE_API . $source . '/' . $type . '/' . $id;
+
+		echo "delete ";
+
+	print_r($url);
 		$post_data = $_POST ;
 		$post_data_json = json_encode($post_data);
 
@@ -76,6 +78,25 @@
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data_json);
+
+		//So that curl_exec returns the contents of the cURL; rather than echoing it
+		curl_setopt($ch,CURLOPT_RETURNTRANSFER, true); 
+
+		//execute post
+		$result = curl_exec($ch);
+		curl_close($ch);
+	}
+
+	function put_curl($url, $post_data_json){
+		$ch = curl_init();
+
+		//set the url, number of POST vars, POST data
+		// curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+		// curl_setopt($ch, CURLOPT_HEADER, TRUE);
+		// curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data_json) );
 
 		//So that curl_exec returns the contents of the cURL; rather than echoing it
 		curl_setopt($ch,CURLOPT_RETURNTRANSFER, true); 
